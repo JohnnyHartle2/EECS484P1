@@ -19,11 +19,11 @@ CREATE TABLE User_Hometown_Cities (hometown_city_id INTEGER, user_id INTEGER,
                                   FOREIGN KEY (hometown_city_id) REFERENCES Cities(city_id) ON DELETE SET NULL, 
                                   FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE SET NULL );
 
-CREATE TABLE Messages (message_id INTEGER, sender_id INTEGER NOT NULL, reciever_id INTEGER NOT NULL, 
+CREATE TABLE Messages (message_id INTEGER, sender_id INTEGER NOT NULL, receiver_id INTEGER NOT NULL, 
                        message_content VARCHAR2(2000) NOT NULL, sent_time TIMESTAMP NOT NULL,
                        PRIMARY KEY (message_id), 
                        FOREIGN KEY (sender_id) REFERENCES Users(user_id) ON DELETE SET NULL, 
-                       FOREIGN KEY (reciever_id) REFERENCES Users(user_id) ON DELETE SET NULL );
+                       FOREIGN KEY (receiver_id) REFERENCES Users(user_id) ON DELETE SET NULL );
 
 CREATE TABLE Programs (program_id INTEGER, institution VARCHAR2(100) NOT NULL, 
                        concentration VARCHAR2(100) NOT NULL, degree VARCHAR2(100) NOT NULL,
@@ -51,10 +51,9 @@ CREATE TABLE Participants (event_id INTEGER, user_id INTEGER NOT NULL, confirmat
 
 CREATE TABLE Albums (album_id INTEGER, album_owner_id INTEGER NOT NULL, album_name VARCHAR2(100) NOT NULL, 
                      album_created_time TIMESTAMP NOT NULL, album_modified_time TIMESTAMP, album_link VARCHAR2(2000) NOT NULL, 
-                     album_visibility VARCHAR2(100) NOT NULL, cover_photo_id INTEGER NOT NULL,
+                     album_visibility VARCHAR2(100) NOT NULL, cover_photo_id INTEGER,
                      PRIMARY KEY (album_id), 
-                     FOREIGN KEY (album_owner_id) REFERENCES Users(user_id) ON DELETE CASCADE, 
-                     FOREIGN KEY (cover_photo_id) REFERENCES Photos(photo_id) ON DELETE SET NULL);
+                     FOREIGN KEY (album_owner_id) REFERENCES Users(user_id) ON DELETE CASCADE);
 
 CREATE TABLE Photos (photo_id INTEGER, album_id INTEGER NOT NULL, photo_caption VARCHAR2(2000) NOT NULL, 
                      photo_created_time TIMESTAMP NOT NULL, photo_modified_time TIMESTAMP, photo_link VARCHAR2(2000) NOT NULL, 
@@ -66,3 +65,8 @@ CREATE TABLE Tags (tag_photo_id INTEGER, tag_subject_id INTEGER, tag_created_tim
                    PRIMARY KEY (tag_photo_id, tag_subject_id), 
                    FOREIGN KEY (tag_photo_id) REFERENCES Photos(photo_id) ON DELETE CASCADE, 
                    FOREIGN KEY (tag_subject_id) REFERENCES Users(user_id) ON DELETE CASCADE);
+
+ALTER TABLE Albums
+  ADD FOREIGN KEY (cover_photo_id)
+  REFERENCES Photos(photo_id)
+  ON DELETE SET NULL;
