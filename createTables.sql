@@ -6,15 +6,15 @@ CREATE TABLE Friends (user1_id INTEGER, user2_id INTEGER, PRIMARY KEY (user1_id,
                       FOREIGN KEY (user1_id) REFERENCES Users(user_id) ON DELETE CASCADE, 
                       FOREIGN KEY (user2_id) REFERENCES Users(user_id) ON DELETE CASCADE);
 
-CREATE TABLE Cities (city_id INTEGER, city_name VARCHAR2(100) NOT NULL, state_name VARCHAR2(100) NOT NULL, country_name VARCHAR2(100),
+CREATE TABLE Cities (city_id INTEGER, city_name VARCHAR2(100) NOT NULL, state_name VARCHAR2(100) NOT NULL, country_name VARCHAR2(100) NOT NULL,
                       PRIMARY KEY (city_id));
 
-CREATE TABLE User_Current_Cities (current_city_id INTEGER, user_id INTEGER,
+CREATE TABLE User_Current_Cities (user_id INTEGER, current_city_id INTEGER,
                                   PRIMARY KEY (current_city_id, user_id), 
                                   FOREIGN KEY (current_city_id) REFERENCES Cities(city_id) ON DELETE SET NULL, 
                                   FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE SET NULL );
 
-CREATE TABLE User_Hometown_Cities (hometown_city_id INTEGER, user_id INTEGER,
+CREATE TABLE User_Hometown_Cities ( user_id INTEGER, hometown_city_id INTEGER,
                                   PRIMARY KEY (hometown_city_id, user_id), 
                                   FOREIGN KEY (hometown_city_id) REFERENCES Cities(city_id) ON DELETE SET NULL, 
                                   FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE SET NULL );
@@ -25,12 +25,11 @@ CREATE TABLE Messages (message_id INTEGER, sender_id INTEGER NOT NULL, receiver_
                        FOREIGN KEY (sender_id) REFERENCES Users(user_id) ON DELETE SET NULL, 
                        FOREIGN KEY (receiver_id) REFERENCES Users(user_id) ON DELETE SET NULL );
 
-CREATE TABLE Programs (program_id INTEGER, institution VARCHAR2(100) NOT NULL, 
-                       concentration VARCHAR2(100) NOT NULL, degree VARCHAR2(100) NOT NULL,
-                       UNIQUE(institution, concentration, degree), 
+CREATE TABLE Programs (program_id INTEGER, institution VARCHAR2(300) NOT NULL, 
+                       concentration VARCHAR2(300) NOT NULL, degree VARCHAR2(300) NOT NULL, 
                        PRIMARY KEY (program_id));
 
-CREATE TABLE Education (user_id INTEGER, program_id INTEGER, program_year INTEGER NOT NULL, 
+CREATE TABLE Education (user_id INTEGER, program_id INTEGER, program_year INTEGER, 
                        PRIMARY KEY (user_id, program_id), 
                        FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE SET NULL, 
                        FOREIGN KEY (program_id) REFERENCES Programs(program_id) ON DELETE SET NULL);
@@ -50,12 +49,12 @@ CREATE TABLE Participants (event_id INTEGER, user_id INTEGER NOT NULL, confirmat
 
 
 CREATE TABLE Albums (album_id INTEGER, album_owner_id INTEGER NOT NULL, album_name VARCHAR2(100) NOT NULL, 
-                     album_created_time TIMESTAMP NOT NULL, album_modified_time TIMESTAMP, album_link VARCHAR2(2000) NOT NULL, 
+                     album_created_time TIMESTAMP NOT NULL, album_modified_time TIMESTAMP NOT NULL, album_link VARCHAR2(2000) NOT NULL, 
                      album_visibility VARCHAR2(100) NOT NULL, cover_photo_id INTEGER,
                      PRIMARY KEY (album_id), 
                      FOREIGN KEY (album_owner_id) REFERENCES Users(user_id) ON DELETE CASCADE);
 
-CREATE TABLE Photos (photo_id INTEGER, album_id INTEGER NOT NULL, photo_caption VARCHAR2(2000) NOT NULL, 
+CREATE TABLE Photos (photo_id INTEGER, album_id INTEGER NOT NULL, photo_caption VARCHAR2(2000), 
                      photo_created_time TIMESTAMP NOT NULL, photo_modified_time TIMESTAMP, photo_link VARCHAR2(2000) NOT NULL, 
                      PRIMARY KEY (photo_id), 
                      FOREIGN KEY (album_id) REFERENCES Albums(album_id) ON DELETE CASCADE);
@@ -70,3 +69,41 @@ ALTER TABLE Albums
   ADD FOREIGN KEY (cover_photo_id)
   REFERENCES Photos(photo_id)
   ON DELETE SET NULL;
+
+
+  CREATE TRIGGER Order_Friend_Pairs
+    BEFORE INSERT ON Friends
+    FOR EACH ROW
+        DECLARE temp INTEGER;
+        BEGIN
+            IF :NEW.user1_id > :NEW.user2_id THEN
+                temp := :NEW.user2_id;
+                :NEW.user2_id := :NEW.user1_id;
+                :NEW.user1_id := temp;
+            END IF;
+        END;
+/
+
+CREATE SEQUENCE New_City_ID
+    START WITH 1
+    INCREMENT BY 1;
+
+CREATE TRIGGER Insert_City
+    BEFORE INSERT ON Cities
+    FOR EACH ROW
+        BEGIN
+            SELECT New_City_ID.NEXTVAL INTO :NEW.city_id FROM DUAL;
+        END;
+/
+
+CREATE SEQUENCE New_Program_ID
+    START WITH 1
+    INCREMENT BY 1;
+
+CREATE TRIGGER Insert_Program
+    BEFORE INSERT ON Programs
+    FOR EACH ROW
+        BEGIN
+            SELECT New_Program_ID.NEXTVAL INTO :NEW.program_id FROM DUAL;
+        END;
+/
