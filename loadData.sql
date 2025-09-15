@@ -26,14 +26,14 @@ AND u.current_state= c.state_name
 AND u.current_country = c.country_name;
 
 INSERT INTO Programs(institution, concentration, degree)
-SELECT institution_name, program_concentration, program_degree 
+SELECT DISTINCT institution_name, program_concentration, program_degree 
 FROM project1.PUBLIC_USER_INFORMATION
 WHERE institution_name IS NOT NULL 
 AND program_concentration IS NOT NULL 
 AND program_degree IS NOT NULL;
 
 INSERT INTO Education(user_id, program_id, program_year)
-SELECT DISTINCT u.user_id, p.program_id, u.program_year
+SELECT u.user_id, p.program_id, u.program_year
 FROM project1.PUBLIC_USER_INFORMATION u
 JOIN Programs p
 ON p.concentration = u.program_concentration
@@ -51,9 +51,19 @@ AND p.event_state = c.state_name
 AND p.event_country	= c.country_name;
 
 INSERT INTO Albums(album_id, album_owner_id, album_name, album_created_time,
-album_modified_time, album_link, album_visibility)
-SELECT p.album_id, u.user_id, p.album_name, p.album_created_time, p.album_modified_time, p.album_link,
-p.album_visibility
+album_modified_time, album_link, album_visibility, cover_photo_id)
+SELECT DISTINCT p.album_id, u.user_id, p.album_name, p.album_created_time, p.album_modified_time, p.album_link,
+p.album_visibility, p.cover_photo_id
 FROM project1.Public_Photo_Information p 
 JOIN Users u 
 ON u.user_id = p.owner_id;
+
+INSERT INTO Photos(photo_id, album_id, photo_caption, photo_created_time, photo_modified_time, photo_link)
+SELECT p.photo_id, a.album_id, p.photo_caption, p.photo_created_time, p.photo_modified_time, p.photo_link
+FROM project1.Public_Photo_Information p
+JOIN Albums a
+ON a.album_id = p.album_id;
+
+INSERT INTO Tags(tag_photo_id, tag_subject_id, tag_created_time, tag_x, tag_y)
+SELECT photo_id, tag_subject_id, tag_created_time, tag_x_coordinate, tag_y_coordinate
+FROM project1.Public_Tag_Information;
