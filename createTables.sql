@@ -54,10 +54,10 @@ CREATE TABLE Participants (event_id INTEGER, user_id INTEGER, confirmation VARCH
                            );
 
 CREATE TABLE Albums (album_id INTEGER, album_owner_id INTEGER, album_name VARCHAR2(100) NOT NULL, 
-                     album_created_time TIMESTAMP NOT NULL, album_modified_time TIMESTAMP, album_link VARCHAR2(2000) NOT NULL, 
+                     album_created_time TIMESTAMP NOT NULL, album_modified_time TIMESTAMP NOT NULL, album_link VARCHAR2(2000) NOT NULL, 
                      album_visibility VARCHAR2(100) NOT NULL,
                      PRIMARY KEY (album_id),
-                     FOREIGN KEY(album_owner_id) REFERENCES Users(user_id),
+                     FOREIGN KEY(album_owner_id) REFERENCES Users(user_id) ON DELETE CASCADE,
                      CHECK (album_visibility = 'Everyone' OR album_visibility = 'Friends' OR album_visibility = 'Friends_Of_Friends' OR album_visibility = 'Myself')
                     );
 
