@@ -50,7 +50,7 @@ CREATE TABLE Participants (event_id INTEGER, user_id INTEGER, confirmation VARCH
                            PRIMARY KEY (event_id, user_id),
                            FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE, 
                            FOREIGN KEY (event_id) REFERENCES User_Events(event_id) ON DELETE CASCADE,
-                           CHECK (confirmation = 'Attending' OR confirmation = 'Unsure' OR confirmation = 'Declines' OR confirmation = 'Not Replied')
+                           CHECK (confirmation = 'Attending' OR confirmation = 'Unsure' OR confirmation = 'Declines' OR confirmation = 'Not_Replied')
                            );
 
 CREATE TABLE Albums (album_id INTEGER, album_owner_id INTEGER, album_name VARCHAR2(100) NOT NULL, 
@@ -68,7 +68,7 @@ CREATE TABLE Photos (photo_id INTEGER, photo_caption VARCHAR2(2000),
 
 ALTER TABLE Photos
   ADD (
-    album_id INTEGER, 
+    album_id INTEGER NOT NULL, 
     FOREIGN KEY (album_id) REFERENCES Albums(album_id)
     ON DELETE CASCADE
     DEFERRABLE INITIALLY DEFERRED
@@ -76,7 +76,7 @@ ALTER TABLE Photos
 
 ALTER TABLE Albums
   ADD (
-    cover_photo_id INTEGER,
+    cover_photo_id INTEGER NOT NULL,
     FOREIGN KEY (cover_photo_id) REFERENCES Photos(photo_id)
     DEFERRABLE INITIALLY DEFERRED
   );
