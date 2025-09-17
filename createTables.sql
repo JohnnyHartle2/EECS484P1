@@ -53,33 +53,29 @@ CREATE TABLE Participants (event_id INTEGER, user_id INTEGER, confirmation VARCH
                            CHECK (confirmation = 'Attending' OR confirmation = 'Unsure' OR confirmation = 'Declines' OR confirmation = 'Not_Replied')
                            );
 
-CREATE TABLE Albums (album_id INTEGER, album_owner_id INTEGER, album_name VARCHAR2(100) NOT NULL, 
-                     album_created_time TIMESTAMP NOT NULL, album_modified_time TIMESTAMP NOT NULL, album_link VARCHAR2(2000) NOT NULL, 
-                     album_visibility VARCHAR2(100) NOT NULL,
+CREATE TABLE Albums (album_id INTEGER, album_owner_id INTEGER NOT NULL, album_name VARCHAR2(100) NOT NULL, 
+                     album_created_time TIMESTAMP NOT NULL, album_modified_time TIMESTAMP, album_link VARCHAR2(2000) NOT NULL, 
+                     album_visibility VARCHAR2(100) NOT NULL, cover_photo_id INTEGER NOT NULL,
                      PRIMARY KEY (album_id),
                      FOREIGN KEY(album_owner_id) REFERENCES Users(user_id) ON DELETE CASCADE,
-                     CHECK (album_visibility = 'Everyone' OR album_visibility = 'Friends' OR album_visibility = 'Friends_Of_Friends' OR album_visibility = 'Myself')
+                     CHECK (album_visibility IN ('Everyone','Friends','Friends_Of_Friends','Myself'))
                     );
 
-CREATE TABLE Photos (photo_id INTEGER, photo_caption VARCHAR2(2000), 
+CREATE TABLE Photos (photo_id INTEGER, album_id INTEGER NOT NULL, photo_caption VARCHAR2(2000), 
                      photo_created_time TIMESTAMP NOT NULL, photo_modified_time TIMESTAMP, photo_link VARCHAR2(2000) NOT NULL, 
                      PRIMARY KEY (photo_id)
                     );
+                    
+ALTER TABLE Photos ADD
+  FOREIGN KEY (album_id)
+  REFERENCES Albums(album_id)
+  ON DELETE CASCADE
+  INITIALLY DEFERRED DEFERRABLE;
 
-ALTER TABLE Photos
-  ADD (
-    album_id INTEGER NOT NULL, 
-    FOREIGN KEY (album_id) REFERENCES Albums(album_id)
-    ON DELETE CASCADE
-    DEFERRABLE INITIALLY DEFERRED
-  );
-
-ALTER TABLE Albums
-  ADD (
-    cover_photo_id INTEGER NOT NULL,
-    FOREIGN KEY (cover_photo_id) REFERENCES Photos(photo_id)
-    DEFERRABLE INITIALLY DEFERRED
-  );
+ALTER TABLE Albums ADD
+  FOREIGN KEY (cover_photo_id)
+  REFERENCES Photos(photo_id)
+  INITIALLY DEFERRED DEFERRABLE;
 
 CREATE TABLE Tags (tag_photo_id INTEGER, tag_subject_id INTEGER, tag_created_time TIMESTAMP NOT NULL, 
                    tag_x NUMBER NOT NULL, tag_y NUMBER NOT NULL,
