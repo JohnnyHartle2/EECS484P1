@@ -20,14 +20,12 @@ ON p.album_id = a.album_id;
 
 CREATE OR REPLACE VIEW VIEW_TAG_INFORMATION AS
 SELECT
-  p.photo_id AS photo_id, 
+  t.tag_photo_id AS photo_id,
   t.tag_subject_id AS tag_subject_id,
-  t.tag_created_time AS tag_created_time, 
-  t.tag_x_coordinate AS tag_x_coordinate, 
-  t.tag_y_coordinate AS tag_y_coordinate,  
-FROM Tags t
-JOIN Photos p
-ON p.photo_id = t.photo_id;
+  t.tag_created_time AS tag_created_time,
+  t.tag_x AS tag_x_coordinate,
+  t.tag_y AS tag_y_coordinate
+FROM Tags t;
 
 
 CREATE OR REPLACE VIEW VIEW_USER_INFORMATION AS
